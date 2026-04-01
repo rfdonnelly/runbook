@@ -1,0 +1,34 @@
+= Title
+
+Determine the Linux kernel version.
+
+[source,sh]
+----
+uname -a
+----
+
+[source,console]
+.Example
+----
+$ uname -a
+Linux MT-504479 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+----
+
+Determine the distribution version.
+
+[source,sh]
+----
+lsb_release -a
+----
+
+[source,console]
+.Example
+----
+$ lsb_release -a
+Distributor ID:	Ubuntu
+Description:	Ubuntu 24.04.4 LTS
+Release:	24.04
+Codename:	noble
+----
+
+Some trailing text.
