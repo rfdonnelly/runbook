@@ -87,6 +87,7 @@ def main() -> None:
         match chunk:
             case Markup():
                 writer.writelines(chunk.lines)
+                print("".join(chunk.lines))
             case CodeBlock():
                 match chunk.type:
                     case "sh":
@@ -94,9 +95,17 @@ def main() -> None:
                         writer.writelines(["\n"])
 
                         command = chunk.body[0].strip()
-                        input(f"Press any key to execute: {command}")
-                        capture = execute_and_capture_command(target_pane, command)
-                        writer.write_output_block(capture)
+                        print(f"$ {command}")
+                        response = input("Execute [y]/n? ")
+                        print()
+                        match response:
+                            case "n":
+                                writer.write_output_block(["NOT EXECUTED"])
+                                continue
+                            case _:
+                                capture = execute_and_capture_command(target_pane, command)
+                                writer.write_output_block(capture)
+                                print("".join(capture))
 
                     case "console":
                         pass
