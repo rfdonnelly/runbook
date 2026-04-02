@@ -54,8 +54,12 @@ def execute_and_capture_command(pane: libtmux.Pane, command: str) -> list[str]:
     pane.window.rename_window(saved_window_name)
 
     text = pane.capture_pane(join_wrapped=True)
+    try:
+        start_index = text.index(marker)
+    except ValueError:
+        text = pane.capture_pane(start="-", join_wrapped=True)
+        start_index = text.index(marker)
 
-    start_index = text.index(marker)
 
     # Extract output (everything after marker minus next prompt)
     text = text[start_index + 1 : -1]
