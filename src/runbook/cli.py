@@ -15,7 +15,7 @@ from runbook.writer import Writers, AsciidocWriter, MarkdownWriter
 
 def create_shellrc() -> NamedTemporaryFile:
     shellrc = NamedTemporaryFile()
-    shellrc.write(br"export PS1='\u@\h:\w\$ '\n")
+    shellrc.write(br"export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '")
     shellrc.flush()
     return shellrc
 
