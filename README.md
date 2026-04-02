@@ -1,10 +1,9 @@
-= Runbook
+# Runbook
 
 A CLI runbook executor.
 
-== Usage
+## Usage
 
-[source,sh]
-----
+```sh
 runbook myrunbook.adoc
-----
+```
