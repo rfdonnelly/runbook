@@ -83,8 +83,8 @@ def edit_command(command: str) -> str:
 
 def main() -> None:
     ifile = Path(sys.argv[1])
-    ofile_adoc = ifile.stem + ".adoc"
-    ofile_md = ifile.stem + ".md"
+    ofile_adoc = ifile.stem + "-result.adoc"
+    ofile_md = ifile.stem + "-result.md"
     ifile = open(ifile, "r")
     ofile_adoc = open(ofile_adoc, "w")
     ofile_md = open(ofile_md, "w")
