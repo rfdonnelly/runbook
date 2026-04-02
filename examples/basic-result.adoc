@@ -1,0 +1,51 @@
+= Title
+
+Determine the Linux kernel version.
+
+[source,sh]
+----
+uname -a
+----
+
+[source,console]
+.Output
+----
+rdonnell@MT-504479:~/repos/hpsc/lab/tools/runbook/examples$  uname -a
+----
+
+Determine the distribution version.
+
+[source,sh]
+----
+lsb_release -a
+----
+
+[source,console]
+.Output
+----
+rdonnell@MT-504479:~/repos/hpsc/lab/tools/runbook/examples$  lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 24.04.4 LTS
+Release:        24.04
+Codename:       noble
+----
+
+Run multiple commands in one block.
+
+[source,sh]
+----
+key=value
+echo $key
+----
+
+[source,console]
+.Output
+----
+rdonnell@MT-504479:~/repos/hpsc/lab/tools/runbook/examples$  key=value
+rdonnell@MT-504479:~/repos/hpsc/lab/tools/runbook/examples$  echo $key
+value
+----
+
+Some trailing text.
+

@@ -26,5 +26,6 @@ class TestAsciidocWriter:
             1
             2
             ----
+
         """)
         assert output.getvalue() == expected

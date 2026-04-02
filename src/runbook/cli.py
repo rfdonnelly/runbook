@@ -136,7 +136,6 @@ def main() -> None:
                                     captures.extend(capture)
 
                         writer.write_command_block(commands)
-                        writer.writenewline()
                         writer.write_output_block(captures)
                         print()
                         print("".join(capture))
