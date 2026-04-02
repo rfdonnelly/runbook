@@ -1,0 +1,10 @@
+= Runbook
+
+A CLI runbook executor.
+
+== Usage
+
+[source,sh]
+----
+runbook myrunbook.adoc
+----

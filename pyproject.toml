@@ -2,7 +2,7 @@
 name = "runbook"
 version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
+readme = {file = "README.adoc", content-type = "text/asciidoc"}
 authors = [
     { name = "Rob Donnelly", email = "Robert.Donnelly@jpl.nasa.gov" }
 ]
