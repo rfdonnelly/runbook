@@ -28,7 +28,6 @@ class TestAsciidocReader:
         expected = Markup(
             [
                 "= Title\n",
-                "\n",
             ]
         )
         assert reader.next_chunk() == expected
@@ -48,11 +47,8 @@ class TestAsciidocReader:
         )
         assert reader.next_chunk() == expected
 
-        expected = Markup(
-            [
-                "\n",
-            ]
-        )
+        # FIXME: Shouldn't return blank chunks
+        expected = Markup([])
         assert reader.next_chunk() == expected
 
         expected = CodeBlock(

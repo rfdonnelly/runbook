@@ -7,6 +7,9 @@ class Writer:
     def __init__(self, writer: TextIO):
         self.writer = writer
 
+    def writenewline(self) -> None:
+        self.writer.write("\n")
+
     def writelines(self, lines: list[str]) -> None:
         self.writer.writelines(lines)
 
@@ -56,6 +59,10 @@ class Writers(Writer):
 
     def __init__(self, writers: list[Writer]):
         self.writers = writers
+
+    def writenewline(self) -> None:
+        for writer in self.writers:
+            writer.writenewline()
 
     def writelines(self, lines: list[str]) -> None:
         for writer in self.writers:

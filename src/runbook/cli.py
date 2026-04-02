@@ -92,31 +92,36 @@ def main() -> None:
     while chunk := reader.next_chunk():
         match chunk:
             case Markup():
-                writer.writelines(chunk.lines)
-                print("".join(chunk.lines))
+                # FIXME: Shouldn't return blank chunks (see test_adocreader)
+                if chunk.lines:
+                    writer.writelines(chunk.lines)
+                    writer.writenewline()
+                    print("".join(chunk.lines))
             case CodeBlock():
                 match chunk.type:
                     case "sh":
-                        writer.write_command_block(chunk.body)
-                        writer.writelines(["\n"])
-
-                        capture_cummulative = []
+                        captures = []
+                        commands = []
                         for line in chunk.body:
                             command = line.strip()
                             print(f"$ {command}")
                             response = input("Execute [y]/n? ")
                             match response:
                                 case "n":
-                                    capture_cummulative.append(f"$ {command}\n")
-                                    capture_cummulative.append("NOT EXECUTED\n")
+                                    commands.append(command + "\n")
+                                    captures.append(f"$ {command}\n")
+                                    captures.append("NOT EXECUTED\n")
                                     continue
                                 case _:
+                                    commands.append(command + "\n")
                                     capture = execute_and_capture_command(
                                         target_pane, command
                                     )
-                                    capture_cummulative.extend(capture)
+                                    captures.extend(capture)
 
-                        writer.write_output_block(capture_cummulative)
+                        writer.write_command_block(commands)
+                        writer.writenewline()
+                        writer.write_output_block(captures)
                         print()
                         print("".join(capture))
 

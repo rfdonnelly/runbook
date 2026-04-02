@@ -44,16 +44,19 @@ class AsciidocReader:
                     return None
                 else:
                     self.eof = True
+                    self.strip_blank_lines(lines)
                     return Markup(lines)
 
             match self.state:
                 case State.Markup:
                     if self.is_eof(line):
                         self.eof = True
+                        self.strip_blank_lines(lines)
                         return Markup(lines)
                     elif self.is_start_of_code_block_header(line):
                         self.previous_line = line
                         self.state = State.CommandBlockHeader
+                        self.strip_blank_lines(lines)
                         return Markup(lines)
                     else:
                         lines.append(line)
@@ -63,18 +66,21 @@ class AsciidocReader:
                         logger.warning(
                             "Reached EOF while parsing a command block header"
                         )
+                        self.strip_blank_lines(lines)
                         return Markup(lines)
                     elif self.is_code_block_body_delimiter(line):
                         self.state = State.CommandBlockBody
                 case State.CommandBlockBody:
                     if self.is_eof(line):
                         logger.warning("Reached EOF while parsing a command block body")
+                        self.strip_blank_lines(lines)
                         return Markup(lines)
                     elif self.is_code_block_body_delimiter(line):
                         self.state = State.Markup
                         lines.append(line)
                         header_end_index = lines.index("----\n")
                         type = lines[0].removeprefix("[source,").removesuffix("]\n")
+                        self.strip_blank_lines(lines)
                         return CodeBlock(
                             type=type,
                             lines=lines,
@@ -82,6 +88,15 @@ class AsciidocReader:
                         )
                     else:
                         lines.append(line)
+
+    @staticmethod
+    def strip_blank_lines(lines: list[str]):
+        while lines and lines[0] == "\n":
+            lines.pop(0)
+
+        while lines and lines[-1] == "\n":
+            lines.pop()
+
 
     @staticmethod
     def is_eof(line: str) -> bool:
