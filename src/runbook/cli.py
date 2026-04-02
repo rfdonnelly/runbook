@@ -138,7 +138,7 @@ def main() -> None:
                         writer.write_command_block(commands)
                         writer.write_output_block(captures)
                         print()
-                        print("".join(capture))
+                        print("".join(captures))
 
                     case "console":
                         pass
