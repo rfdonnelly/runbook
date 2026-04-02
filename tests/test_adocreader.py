@@ -1,10 +1,11 @@
 import textwrap
 from io import StringIO
 
-from runbook.reader import AdocReader, Markup, CodeBlock
+from runbook.reader import AsciidocReader
+from runbook.datamodel import Markup, CodeBlock
 
 
-class TestAdocReader:
+class TestAsciidocReader:
     def test_basic(self):
         input = """\
             = Title
@@ -23,7 +24,7 @@ class TestAdocReader:
             ----
         """
         input = textwrap.dedent(input)
-        reader = AdocReader(StringIO(input))
+        reader = AsciidocReader(StringIO(input))
         expected = Markup(
             [
                 "= Title\n",

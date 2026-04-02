@@ -1,5 +1,4 @@
-import code
-from io import StringIO
+from pathlib import Path
 import random
 import string
 import sys
@@ -9,8 +8,8 @@ import time
 import libtmux
 from libtmux.constants import PaneDirection
 
-from runbook.reader import AdocReader, Markup, CodeBlock
-from runbook.writer import AdocWriter
+from runbook.reader import AsciidocReader, Markup, CodeBlock
+from runbook.writer import Writers, AsciidocWriter, MarkdownWriter
 
 
 def create_shellrc() -> NamedTemporaryFile:
@@ -70,11 +69,14 @@ def execute_and_capture_command(pane: libtmux.Pane, command: str) -> list[str]:
 
 
 def main() -> None:
-    ifile = sys.argv[1]
+    ifile = Path(sys.argv[1])
+    ofile_adoc = ifile.stem + ".adoc"
+    ofile_md = ifile.stem + ".md"
     ifile = open(ifile, "r")
-    ofile = StringIO()
-    reader = AdocReader(ifile)
-    writer = AdocWriter(ofile)
+    ofile_adoc = open(ofile_adoc, "w")
+    ofile_md = open(ofile_md, "w")
+    reader = AsciidocReader(ifile)
+    writer = Writers([AsciidocWriter(ofile_adoc), MarkdownWriter(ofile_md)])
 
     tmux = libtmux.Server()
 
@@ -91,25 +93,30 @@ def main() -> None:
             case CodeBlock():
                 match chunk.type:
                     case "sh":
-                        writer.writelines(chunk.lines)
+                        writer.write_command_block(chunk.body)
                         writer.writelines(["\n"])
 
-                        command = chunk.body[0].strip()
-                        print(f"$ {command}")
-                        response = input("Execute [y]/n? ")
+                        capture_cummulative = []
+                        for line in chunk.body:
+                            command = line.strip()
+                            print(f"$ {command}")
+                            response = input("Execute [y]/n? ")
+                            match response:
+                                case "n":
+                                    capture_cummulative.append(f"$ {command}\n")
+                                    capture_cummulative.append("NOT EXECUTED\n")
+                                    continue
+                                case _:
+                                    capture = execute_and_capture_command(
+                                        target_pane, command
+                                    )
+                                    capture_cummulative.extend(capture)
+
+                        writer.write_output_block(capture_cummulative)
                         print()
-                        match response:
-                            case "n":
-                                writer.write_output_block(["NOT EXECUTED"])
-                                continue
-                            case _:
-                                capture = execute_and_capture_command(target_pane, command)
-                                writer.write_output_block(capture)
-                                print("".join(capture))
+                        print("".join(capture))
 
                     case "console":
                         pass
 
     target_pane.kill()
-
-    print(ofile.getvalue())

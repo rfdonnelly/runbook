@@ -1,26 +1,12 @@
-from dataclasses import dataclass
 from enum import Enum
 import logging
 from typing import TextIO
 
 
+from runbook.datamodel import Chunk, Markup, CodeBlock
+
+
 logger = logging.getLogger(__name__)
-
-
-class Chunk:
-    pass
-
-
-@dataclass
-class Markup(Chunk):
-    lines: list[str]
-
-
-@dataclass
-class CodeBlock(Chunk):
-    type: str
-    lines: list[str]
-    body: list[str]
 
 
 class State(Enum):
@@ -29,7 +15,7 @@ class State(Enum):
     CommandBlockBody = 3
 
 
-class AdocReader:
+class AsciidocReader:
     reader: TextIO
     state: State
     previous_line: str | None

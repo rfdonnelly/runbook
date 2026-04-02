@@ -1,13 +1,13 @@
 import textwrap
 from io import StringIO
 
-from runbook.writer import AdocWriter
+from runbook.writer import AsciidocWriter
 
 
-class TestAdocWriter:
+class TestAsciidocWriter:
     def test_writelines(self):
         output = StringIO()
-        writer = AdocWriter(output)
+        writer = AsciidocWriter(output)
         writer.writelines(["1\n", "2\n"])
         expected = textwrap.dedent("""\
             1
@@ -17,7 +17,7 @@ class TestAdocWriter:
 
     def test_write_output_block(self):
         output = StringIO()
-        writer = AdocWriter(output)
+        writer = AsciidocWriter(output)
         writer.write_output_block(["1\n", "2\n"])
         expected = textwrap.dedent("""\
             [source,console]

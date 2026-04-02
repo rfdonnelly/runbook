@@ -31,4 +31,11 @@ Release:	24.04
 Codename:	noble
 ----
 
+[source,sh]
+.A multiline listing
+----
+key=value
+echo $key
+----
+
 Some trailing text.
