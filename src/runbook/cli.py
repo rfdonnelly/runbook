@@ -1,6 +1,7 @@
 from pathlib import Path
 import random
 import string
+import subprocess
 import sys
 from tempfile import NamedTemporaryFile
 import time
@@ -72,6 +73,14 @@ def execute_and_capture_command(pane: libtmux.Pane, command: str) -> list[str]:
     return text
 
 
+def edit_command(command: str) -> str:
+    with NamedTemporaryFile() as tfile:
+        tfile.write(command.encode())
+        tfile.flush()
+        subprocess.run(["vim", tfile.name])
+        tfile.seek(0)
+        return tfile.read().decode().strip()
+
 def main() -> None:
     ifile = Path(sys.argv[1])
     ofile_adoc = ifile.stem + ".adoc"
@@ -105,8 +114,15 @@ def main() -> None:
                         for line in chunk.body:
                             command = line.strip()
                             print(f"$ {command}")
-                            response = input("Execute [y]/n? ")
+                            response = input("Execute [y]/n/e? ")
                             match response:
+                                case "e":
+                                    command = edit_command(command)
+                                    commands.append(command + "\n")
+                                    capture = execute_and_capture_command(
+                                        target_pane, command
+                                    )
+                                    captures.extend(capture)
                                 case "n":
                                     commands.append(command + "\n")
                                     captures.append(f"$ {command}\n")
