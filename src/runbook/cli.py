@@ -9,7 +9,7 @@ import time
 import libtmux
 from libtmux.constants import PaneDirection
 
-from runbook.reader import AdocReader, ChunkType
+from runbook.reader import AdocReader, Markup, CodeBlock
 from runbook.writer import AdocWriter
 
 
@@ -34,7 +34,7 @@ def create_marker() -> str:
     return random_string
 
 
-def execute_and_capture_command(pane: libtmux.Pane, command: str) -> str:
+def execute_and_capture_command(pane: libtmux.Pane, command: str) -> list[str]:
     """
     Executes a command in the provided pane and returns the output including
     prompt and command.
@@ -84,17 +84,22 @@ def main() -> None:
     target_pane = create_pane(host_pane, shellrc.name)
 
     while chunk := reader.next_chunk():
-        match chunk.type:
-            case ChunkType.Markup:
+        match chunk:
+            case Markup():
                 writer.writelines(chunk.lines)
-            case ChunkType.CommandBlock:
-                writer.writelines(chunk.lines)
-                writer.writelines(["----\n", "\n"])
+            case CodeBlock():
+                match chunk.type:
+                    case "sh":
+                        writer.writelines(chunk.lines)
+                        writer.writelines(["\n"])
 
-                command = chunk.lines[0].strip()
-                input(f"Press any key to execute: {command}")
-                capture = execute_and_capture_command(target_pane, command)
-                writer.write_output_block(capture)
+                        command = chunk.body[0].strip()
+                        input(f"Press any key to execute: {command}")
+                        capture = execute_and_capture_command(target_pane, command)
+                        writer.write_output_block(capture)
+
+                    case "console":
+                        pass
 
     target_pane.kill()
 

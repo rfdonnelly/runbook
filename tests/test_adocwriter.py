@@ -15,7 +15,6 @@ class TestAdocWriter:
         """)
         assert output.getvalue() == expected
 
-
     def test_write_output_block(self):
         output = StringIO()
         writer = AdocWriter(output)
@@ -29,5 +28,3 @@ class TestAdocWriter:
             ----
         """)
         assert output.getvalue() == expected
-
-

@@ -1,17 +1,26 @@
 from dataclasses import dataclass
 from enum import Enum
+import logging
 from typing import TextIO
 
 
-class ChunkType(Enum):
-    Markup = 1
-    CommandBlock = 2
+logger = logging.getLogger(__name__)
+
+
+class Chunk:
+    pass
 
 
 @dataclass
-class Chunk:
-    type: ChunkType
+class Markup(Chunk):
     lines: list[str]
+
+
+@dataclass
+class CodeBlock(Chunk):
+    type: str
+    lines: list[str]
+    body: list[str]
 
 
 class State(Enum):
@@ -49,36 +58,42 @@ class AdocReader:
                     return None
                 else:
                     self.eof = True
-                    return Chunk(type=ChunkType.Markup, lines=lines)
+                    return Markup(lines)
 
             match self.state:
                 case State.Markup:
                     if self.is_eof(line):
                         self.eof = True
-                        return Chunk(type=ChunkType.Markup, lines=lines)
-                    elif self.is_start_of_command_block_header(line):
-                        lines.append(line)
+                        return Markup(lines)
+                    elif self.is_start_of_code_block_header(line):
+                        self.previous_line = line
                         self.state = State.CommandBlockHeader
+                        return Markup(lines)
                     else:
                         lines.append(line)
                 case State.CommandBlockHeader:
                     lines.append(line)
                     if self.is_eof(line):
-                        raise ApplicationError(
+                        logger.warning(
                             "Reached EOF while parsing a command block header"
                         )
-                    elif self.is_command_block_body_delimiter(line):
+                        return Markup(lines)
+                    elif self.is_code_block_body_delimiter(line):
                         self.state = State.CommandBlockBody
-                        return Chunk(type=ChunkType.Markup, lines=lines)
                 case State.CommandBlockBody:
                     if self.is_eof(line):
-                        raise ApplicationError(
-                            "Reached EOF while parsing a command block body"
-                        )
-                    elif self.is_command_block_body_delimiter(line):
+                        logger.warning("Reached EOF while parsing a command block body")
+                        return Markup(lines)
+                    elif self.is_code_block_body_delimiter(line):
                         self.state = State.Markup
-                        self.previous_line = line
-                        return Chunk(type=ChunkType.CommandBlock, lines=lines)
+                        lines.append(line)
+                        header_end_index = lines.index("----\n")
+                        type = lines[0].removeprefix("[source,").removesuffix("]\n")
+                        return CodeBlock(
+                            type=type,
+                            lines=lines,
+                            body=lines[header_end_index + 1 : -1],
+                        )
                     else:
                         lines.append(line)
 
@@ -87,9 +102,9 @@ class AdocReader:
         return line == ""
 
     @staticmethod
-    def is_start_of_command_block_header(line: str) -> bool:
-        return line.startswith("[source,sh]")
+    def is_start_of_code_block_header(line: str) -> bool:
+        return line.startswith("[source,sh]") or line.startswith("[source,console]")
 
     @staticmethod
-    def is_command_block_body_delimiter(line: str) -> bool:
+    def is_code_block_body_delimiter(line: str) -> bool:
         return line.startswith("----")
