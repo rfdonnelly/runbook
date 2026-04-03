@@ -4,6 +4,14 @@ A CLI runbook executor.
 
 ## Usage
 
+Start tmux.
+
 ```sh
-runbook myrunbook.adoc
+tmux
+```
+
+Start a runbook.
+
+```sh
+runbook examples/basic.adoc
 ```
