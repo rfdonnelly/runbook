@@ -97,7 +97,6 @@ class AsciidocReader:
         while lines and lines[-1] == "\n":
             lines.pop()
 
-
     @staticmethod
     def is_eof(line: str) -> bool:
         return line == ""

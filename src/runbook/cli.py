@@ -15,7 +15,9 @@ from runbook.writer import Writers, AsciidocWriter, MarkdownWriter
 
 def create_shellrc() -> NamedTemporaryFile:
     shellrc = NamedTemporaryFile()
-    shellrc.write(br"export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '")
+    shellrc.write(
+        rb"export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '"
+    )
     shellrc.flush()
     return shellrc
 
@@ -61,7 +63,6 @@ def execute_and_capture_command(pane: libtmux.Pane, command: str) -> list[str]:
         text = pane.capture_pane(start="-", join_wrapped=True)
         start_index = text.index(marker)
 
-
     # Extract output (everything after marker minus next prompt)
     text = text[start_index + 1 : -1]
 
@@ -80,6 +81,7 @@ def edit_command(command: str) -> str:
         subprocess.run(["vim", tfile.name])
         tfile.seek(0)
         return tfile.read().decode().strip()
+
 
 def main() -> None:
     ifile = Path(sys.argv[1])
