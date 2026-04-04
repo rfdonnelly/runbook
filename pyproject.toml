@@ -9,10 +9,13 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "libtmux>=0.55.0",
+    "pydowndoc[bin]>=2.3.1",
+    "textual>=8.2.2",
 ]
 
 [project.scripts]
 runbook = "runbook.cli:main"
+runbook-tui = "runbook.tui:main"
 
 [build-system]
 requires = ["uv_build>=0.11.1,<0.12.0"]
