@@ -31,7 +31,7 @@ def main() -> None:
 
     target_pane = tmux.create_pane(tmux.host_pane)
 
-    while chunk := reader.next_chunk():
+    for chunk in reader:
         match chunk:
             case Markup():
                 # FIXME: Shouldn't return blank chunks (see test_adocreader)

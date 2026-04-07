@@ -1,6 +1,8 @@
 import textwrap
 from io import StringIO
 
+import pytest
+
 from runbook.reader import AsciidocReader
 from runbook.datamodel import Markup, CodeBlock
 
@@ -30,7 +32,7 @@ class TestAsciidocReader:
                 "= Title\n",
             ]
         )
-        assert reader.next_chunk() == expected
+        assert next(reader) == expected
 
         expected = CodeBlock(
             type="sh",
@@ -45,11 +47,11 @@ class TestAsciidocReader:
                 "command\n",
             ],
         )
-        assert reader.next_chunk() == expected
+        assert next(reader) == expected
 
         # FIXME: Shouldn't return blank chunks
         expected = Markup([])
-        assert reader.next_chunk() == expected
+        assert next(reader) == expected
 
         expected = CodeBlock(
             type="console",
@@ -66,6 +68,7 @@ class TestAsciidocReader:
                 "output\n",
             ],
         )
-        assert reader.next_chunk() == expected
+        assert next(reader) == expected
 
-        assert reader.next_chunk() is None
+        with pytest.raises(StopIteration):
+            next(reader)

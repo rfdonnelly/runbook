@@ -1,6 +1,6 @@
 from enum import Enum
 import logging
-from typing import TextIO
+from typing import TextIO, Self
 
 
 from runbook.datamodel import Chunk, Markup, CodeBlock
@@ -27,9 +27,12 @@ class AsciidocReader:
         self.previous_line = None
         self.eof = False
 
-    def next_chunk(self) -> Chunk | None:
+    def __iter__(self) -> Self:
+        return self
+
+    def __next__(self) -> Chunk:
         if self.eof:
-            return None
+            raise StopIteration
 
         if self.previous_line:
             lines = [self.previous_line]
@@ -41,7 +44,7 @@ class AsciidocReader:
             line = self.reader.readline()
             if self.is_eof(line):
                 if not lines:
-                    return None
+                    raise StopIteration
                 else:
                     self.eof = True
                     self.strip_blank_lines(lines)
