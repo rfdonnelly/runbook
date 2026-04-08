@@ -22,7 +22,6 @@ class TmuxPane:
 
         return captures
 
-
     def execute_and_capture_command(self, command: str) -> list[str]:
         """
         Executes a command in the provided pane and returns the output including

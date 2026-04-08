@@ -1,15 +1,16 @@
 from runbook.book import Book
-from runbook.datamodel import Chunk, Markup, CodeBlock
+from runbook.datamodel import Markup, CodeBlock
+
 
 class TestBook:
     def test_basic(self):
         chunks = [
-                Markup(["1"]),
-                CodeBlock("sh", ["2"]),
-                CodeBlock("sh", ["3"]),
-                Markup(["4"]),
-                CodeBlock("sh", ["5"]),
-                ]
+            Markup(["1"]),
+            CodeBlock("sh", ["2"]),
+            CodeBlock("sh", ["3"]),
+            Markup(["4"]),
+            CodeBlock("sh", ["5"]),
+        ]
         book = Book(chunks)
 
         assert book.first_chunk() == chunks[0]

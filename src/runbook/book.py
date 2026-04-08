@@ -2,8 +2,10 @@ from typing import Iterable
 
 from runbook.datamodel import Chunk, Markup, CodeBlock
 
+
 class IterError(Exception):
     pass
+
 
 class Book:
     chunks: list[Chunk]
