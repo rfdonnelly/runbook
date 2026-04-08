@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class Chunk:
@@ -14,4 +14,5 @@ class Markup(Chunk):
 class CodeBlock(Chunk):
     type: str
     lines: list[str]
-    body: list[str]
+    body: list[str] = field(default_factory=list)
+    captures: list[str] = field(default_factory=list)

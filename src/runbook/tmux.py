@@ -13,6 +13,16 @@ class TmuxPane:
     def __init__(self, pane: libtmux.Pane):
         self.pane = pane
 
+    def execute_and_capture_commands(self, commands: list[str]) -> list[str]:
+        captures = []
+
+        for command in commands:
+            capture = self.execute_and_capture_command(command.strip())
+            captures.extend(capture)
+
+        return captures
+
+
     def execute_and_capture_command(self, command: str) -> list[str]:
         """
         Executes a command in the provided pane and returns the output including

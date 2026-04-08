@@ -4,17 +4,18 @@ import sys
 from tempfile import NamedTemporaryFile
 
 from runbook.tmux import Tmux
+from runbook.book import Book
 from runbook.reader import AsciidocReader, Markup, CodeBlock
 from runbook.writer import Writers, AsciidocWriter, MarkdownWriter
 
 
-def edit_command(command: str) -> str:
-    with NamedTemporaryFile() as tfile:
-        tfile.write(command.encode())
-        tfile.flush()
-        subprocess.run(["vim", tfile.name])
-        tfile.seek(0)
-        return tfile.read().decode().strip()
+def edit_command(commands: list[str]) -> list[str]:
+    with NamedTemporaryFile(mode="wt", delete_on_close=False) as wfile:
+        wfile.writelines(commands)
+        wfile.close()
+        subprocess.run(["vim", wfile.name])
+        with open(wfile.name, mode="rt") as rfile:
+            return rfile.readlines()
 
 
 def main() -> None:
@@ -31,7 +32,10 @@ def main() -> None:
 
     target_pane = tmux.create_pane(tmux.host_pane)
 
-    for chunk in reader:
+    book = Book(reader)
+    chunk = book.first_chunk()
+
+    while True:
         match chunk:
             case Markup():
                 # FIXME: Shouldn't return blank chunks (see test_adocreader)
@@ -39,41 +43,44 @@ def main() -> None:
                     writer.writelines(chunk.lines)
                     writer.writenewline()
                     print("".join(chunk.lines))
-            case CodeBlock():
-                match chunk.type:
-                    case "sh":
-                        captures = []
-                        commands = []
-                        for line in chunk.body:
-                            command = line.strip()
-                            print(f"$ {command}")
-                            response = input("Execute [y]/n/e? ")
-                            match response:
-                                case "e":
-                                    command = edit_command(command)
-                                    commands.append(command + "\n")
-                                    capture = target_pane.execute_and_capture_command(
-                                        command
-                                    )
-                                    captures.extend(capture)
-                                case "n":
-                                    commands.append(command + "\n")
-                                    captures.append(f"$ {command}\n")
-                                    captures.append("NOT EXECUTED\n")
-                                    continue
-                                case _:
-                                    commands.append(command + "\n")
-                                    capture = target_pane.execute_and_capture_command(
-                                        command
-                                    )
-                                    captures.extend(capture)
-
-                        writer.write_command_block(commands)
-                        writer.write_output_block(captures)
-                        print()
-                        print("".join(captures))
-
-                    case "console":
+            case CodeBlock(type="sh"):
+                print("".join(chunk.body))
+                response = input("E[X]ecute/[n]ext/[e]dit/[p]revious? ")
+                match response:
+                    case "e":
+                        chunk.body = edit_command(chunk.body)
+                        chunk.captures = target_pane.execute_and_capture_commands(
+                            chunk.body
+                        )
+                        print("".join(chunk.captures))
+                    case "n":
                         pass
+                    case "p":
+                        chunk = book.prev_command_block()
+                        continue
+                    case _:
+                        chunk.captures = target_pane.execute_and_capture_commands(
+                            chunk.body
+                        )
+                        print("".join(chunk.captures))
 
-    target_pane.pane.kill()
+        if book.next_chunk_exists():
+            chunk = book.next_chunk()
+        else:
+            break
+
+    response = input("execution complete\nclose pane? (y/N)")
+    match response:
+        case "y":
+            target_pane.pane.kill()
+
+    for chunk in book.chunks:
+        match chunk:
+            case Markup():
+                # FIXME: Shouldn't return blank chunks (see test_adocreader)
+                if chunk.lines:
+                    writer.writelines(chunk.lines)
+                    writer.writenewline()
+            case CodeBlock(type="sh"):
+                writer.write_command_block(chunk.body)
+                writer.write_output_block(chunk.captures)
