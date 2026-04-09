@@ -37,7 +37,6 @@ class TmuxPane:
         marker = self.create_marker()
         saved_window_name = self.pane.window.name
 
-        self.pane.send_keys(f"echo {marker}")
         self.pane.send_keys(f"{command}; tmux rename-window {marker}")
 
         # Wait for command to complete. Completion is signaled by rename-window.
@@ -45,22 +44,26 @@ class TmuxPane:
             time.sleep(0.1)
         self.pane.window.rename_window(saved_window_name)
 
-        text = self.pane.capture_pane(join_wrapped=True)
+        lines = self.pane.capture_pane(join_wrapped=True)
         try:
-            start_index = text.index(marker)
-        except ValueError:
-            text = self.pane.capture_pane(start="-", join_wrapped=True)
-            start_index = text.index(marker)
+            start_index = next(
+                (index for (index, line) in enumerate(lines) if line.endswith(marker))
+            )
+        except StopIteration:
+            lines = self.pane.capture_pane(start="-", join_wrapped=True)
+            start_index = next(
+                (index for (index, line) in enumerate(lines) if line.endswith(marker))
+            )
 
-        # Extract output (everything after marker minus next prompt)
-        text = text[start_index + 1 : -1]
+        # Extract output (prompt + command + marker to line before next prompt)
+        lines = lines[start_index:-1]
 
         # Trim end marker
-        text[0], _ = text[0].rsplit(";")
+        lines[0], _ = lines[0].rsplit(";")
 
-        text = [line + "\n" for line in text]
+        lines = [line + "\n" for line in lines]
 
-        return text
+        return lines
 
     @staticmethod
     def create_marker() -> str:
