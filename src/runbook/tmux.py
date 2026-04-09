@@ -46,20 +46,28 @@ class TmuxPane:
 
         lines = self.pane.capture_pane(join_wrapped=True)
         try:
+            # Try capturing only visible text first
             start_index = next(
                 (index for (index, line) in enumerate(lines) if line.endswith(marker))
             )
+            lines = lines[start_index:-1]
+
+            # Trim end marker
+            lines[0], _ = lines[0].rsplit(";")
         except StopIteration:
-            lines = self.pane.capture_pane(start="-", join_wrapped=True)
-            start_index = next(
-                (index for (index, line) in enumerate(lines) if line.endswith(marker))
-            )
+            try:
+                # Fall back to capturing entire scrollback buffer
+                lines = self.pane.capture_pane(start="-", join_wrapped=True)
+                start_index = next(
+                    (index for (index, line) in enumerate(lines) if line.endswith(marker))
+                )
+                lines = lines[start_index:-1]
 
-        # Extract output (prompt + command + marker to line before next prompt)
-        lines = lines[start_index:-1]
-
-        # Trim end marker
-        lines[0], _ = lines[0].rsplit(";")
+                # Trim end marker
+                lines[0], _ = lines[0].rsplit(";")
+            except StopIteration:
+                # Fall back to captuing entire scrollback buffer w/o prompt + command
+                lines = ["<< SCROLLBACK EXCEEDED >>", *lines[0:-1]]
 
         lines = [line + "\n" for line in lines]
 

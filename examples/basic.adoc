@@ -39,4 +39,11 @@ key=value
 echo $key
 ----
 
+Test output exceeds scrollback.
+
+[source,sh]
+----
+seq 4000
+----
+
 Some trailing text.
