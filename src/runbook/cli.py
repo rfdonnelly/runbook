@@ -24,11 +24,11 @@ def inputkey(prompt: str, valid_chars: str, default_char: str | None = None) -> 
                 print(prompt, end="", flush=True)
             case key.ENTER:
                 if default_char:
-                    print(f"\r\033[K", end="", flush=True)
+                    print("\r\033[K", end="", flush=True)
                     return default_char
             case _:
                 if value in valid_chars:
-                    print(f"\r\033[K", end="", flush=True)
+                    print("\r\033[K", end="", flush=True)
                     return value
 
 
@@ -71,7 +71,9 @@ def main() -> None:
                     print("".join(chunk.lines))
             case CodeBlock(type="sh"):
                 print("".join(chunk.body))
-                response = inputkey("E[X]ecute/[n]ext/[e]dit/[p]revious/[q]uit? ", "xnepq", "x")
+                response = inputkey(
+                    "E[X]ecute/[n]ext/[e]dit/[p]revious/[q]uit? ", "xnepq", "x"
+                )
                 match response:
                     case "e":
                         chunk.body = edit_command(chunk.body)
@@ -85,7 +87,6 @@ def main() -> None:
                         chunk.captures = pane.execute_and_capture_commands(chunk.body)
                     case "q":
                         break
-
 
         if book.next_chunk_exists():
             chunk = book.next_chunk()
