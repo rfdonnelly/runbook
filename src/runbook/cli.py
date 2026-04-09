@@ -1,12 +1,35 @@
+import os
 from pathlib import Path
+import signal
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
+
+from readchar import readkey, key
 
 from runbook.tmux import Tmux
 from runbook.book import Book
 from runbook.reader import AsciidocReader, Markup, CodeBlock
 from runbook.writer import Writers, AsciidocWriter, MarkdownWriter
+
+
+def inputkey(prompt: str, valid_chars: str, default_char: str | None = None) -> str:
+    print(prompt, end="", flush=True)
+
+    while True:
+        value = readkey()
+        match value:
+            case key.CTRL_Z:
+                os.kill(os.getpid(), signal.SIGSTOP)
+                print(prompt, end="", flush=True)
+            case key.ENTER:
+                if default_char:
+                    print(f"\r\033[K", end="", flush=True)
+                    return default_char
+            case _:
+                if value in valid_chars:
+                    print(f"\r\033[K", end="", flush=True)
+                    return value
 
 
 def edit_command(commands: list[str]) -> list[str]:
@@ -48,30 +71,26 @@ def main() -> None:
                     print("".join(chunk.lines))
             case CodeBlock(type="sh"):
                 print("".join(chunk.body))
-                response = input("E[X]ecute/[n]ext/[e]dit/[p]revious? ")
+                response = inputkey("E[X]ecute/[n]ext/[e]dit/[p]revious/[q]uit? ", "xnepq", "x")
                 match response:
                     case "e":
                         chunk.body = edit_command(chunk.body)
                         chunk.captures = pane.execute_and_capture_commands(chunk.body)
-                        print("".join(chunk.captures))
                     case "n":
                         pass
                     case "p":
                         chunk = book.prev_command_block()
                         continue
-                    case _:
+                    case "x":
                         chunk.captures = pane.execute_and_capture_commands(chunk.body)
-                        print("".join(chunk.captures))
+                    case "q":
+                        break
+
 
         if book.next_chunk_exists():
             chunk = book.next_chunk()
         else:
             break
-
-    response = input("execution complete\nclose pane? (y/N)")
-    match response:
-        case "y":
-            pane.kill()
 
     for chunk in book.chunks:
         match chunk:
@@ -83,3 +102,8 @@ def main() -> None:
             case CodeBlock(type="sh"):
                 writer.write_command_block(chunk.body)
                 writer.write_output_block(chunk.captures)
+
+    response = inputkey("Execution complete. Close pane? (y/n) ", "yn")
+    match response:
+        case "y":
+            pane.kill()
