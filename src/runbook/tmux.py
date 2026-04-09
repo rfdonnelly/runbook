@@ -59,7 +59,11 @@ class TmuxPane:
                 # Fall back to capturing entire scrollback buffer
                 lines = self.pane.capture_pane(start="-", join_wrapped=True)
                 start_index = next(
-                    (index for (index, line) in enumerate(lines) if line.endswith(marker))
+                    (
+                        index
+                        for (index, line) in enumerate(lines)
+                        if line.endswith(marker)
+                    )
                 )
                 lines = lines[start_index:-1]
 
