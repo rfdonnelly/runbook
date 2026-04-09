@@ -15,7 +15,10 @@ def edit_command(commands: list[str]) -> list[str]:
         wfile.close()
         subprocess.run(["vim", wfile.name])
         with open(wfile.name, mode="rt") as rfile:
-            return rfile.readlines()
+            lines = rfile.readlines()
+            # filter blank lines
+            lines = [line for line in lines if line != "\n"]
+            return lines
 
 
 def main() -> None:
