@@ -13,6 +13,9 @@ class TmuxPane:
     def __init__(self, pane: libtmux.Pane):
         self.pane = pane
 
+    def kill(self) -> None:
+        self.pane.kill()
+
     def execute_and_capture_commands(self, commands: list[str]) -> list[str]:
         captures = []
 

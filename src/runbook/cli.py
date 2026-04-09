@@ -30,7 +30,7 @@ def main() -> None:
 
     tmux = Tmux()
 
-    target_pane = tmux.create_pane(tmux.host_pane)
+    pane = tmux.create_pane(tmux.host_pane)
 
     book = Book(reader)
     chunk = book.first_chunk()
@@ -49,9 +49,7 @@ def main() -> None:
                 match response:
                     case "e":
                         chunk.body = edit_command(chunk.body)
-                        chunk.captures = target_pane.execute_and_capture_commands(
-                            chunk.body
-                        )
+                        chunk.captures = pane.execute_and_capture_commands(chunk.body)
                         print("".join(chunk.captures))
                     case "n":
                         pass
@@ -59,9 +57,7 @@ def main() -> None:
                         chunk = book.prev_command_block()
                         continue
                     case _:
-                        chunk.captures = target_pane.execute_and_capture_commands(
-                            chunk.body
-                        )
+                        chunk.captures = pane.execute_and_capture_commands(chunk.body)
                         print("".join(chunk.captures))
 
         if book.next_chunk_exists():
@@ -72,7 +68,7 @@ def main() -> None:
     response = input("execution complete\nclose pane? (y/N)")
     match response:
         case "y":
-            target_pane.pane.kill()
+            pane.kill()
 
     for chunk in book.chunks:
         match chunk:
