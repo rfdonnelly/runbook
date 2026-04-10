@@ -13,6 +13,28 @@ from runbook.reader import AsciidocReader, Markup, CodeBlock
 from runbook.writer import Writers, AsciidocWriter, MarkdownWriter
 
 
+def write_results(book: Book, path_stem: str) -> None:
+    ofile_adoc = path_stem + "-result.adoc"
+    ofile_md = path_stem + "-result.md"
+    ofile_adoc = open(ofile_adoc, "w")
+    ofile_md = open(ofile_md, "w")
+    writer = Writers([AsciidocWriter(ofile_adoc), MarkdownWriter(ofile_md)])
+
+    for chunk in book.chunks:
+        match chunk:
+            case Markup():
+                # FIXME: Shouldn't return blank chunks (see test_adocreader)
+                if chunk.lines:
+                    writer.writelines(chunk.lines)
+                    writer.writenewline()
+            case CodeBlock(type="sh"):
+                writer.write_command_block(chunk.body)
+                writer.write_output_block(chunk.captures)
+
+    ofile_adoc.close()
+    ofile_md.close()
+
+
 def inputkey(prompt: str, valid_chars: str, default_char: str | None = None) -> str:
     print(prompt, end="", flush=True)
 
@@ -45,14 +67,9 @@ def edit_command(commands: list[str]) -> list[str]:
 
 
 def main() -> None:
-    ifile = Path(sys.argv[1])
-    ofile_adoc = ifile.stem + "-result.adoc"
-    ofile_md = ifile.stem + "-result.md"
-    ifile = open(ifile, "r")
-    ofile_adoc = open(ofile_adoc, "w")
-    ofile_md = open(ofile_md, "w")
+    ifile_path = Path(sys.argv[1])
+    ifile = open(ifile_path, "r")
     reader = AsciidocReader(ifile)
-    writer = Writers([AsciidocWriter(ofile_adoc), MarkdownWriter(ofile_md)])
 
     tmux = Tmux()
 
@@ -66,8 +83,6 @@ def main() -> None:
             case Markup():
                 # FIXME: Shouldn't return blank chunks (see test_adocreader)
                 if chunk.lines:
-                    writer.writelines(chunk.lines)
-                    writer.writenewline()
                     print("".join(chunk.lines))
             case CodeBlock(type="sh"):
                 print("".join(chunk.body))
@@ -78,6 +93,7 @@ def main() -> None:
                     case "e":
                         chunk.body = edit_command(chunk.body)
                         chunk.captures = pane.execute_and_capture_commands(chunk.body)
+                        write_results(book, ifile_path.stem)
                     case "n":
                         pass
                     case "p":
@@ -85,6 +101,7 @@ def main() -> None:
                         continue
                     case "x":
                         chunk.captures = pane.execute_and_capture_commands(chunk.body)
+                        write_results(book, ifile_path.stem)
                     case "q":
                         break
 
@@ -92,17 +109,6 @@ def main() -> None:
             chunk = book.next_chunk()
         else:
             break
-
-    for chunk in book.chunks:
-        match chunk:
-            case Markup():
-                # FIXME: Shouldn't return blank chunks (see test_adocreader)
-                if chunk.lines:
-                    writer.writelines(chunk.lines)
-                    writer.writenewline()
-            case CodeBlock(type="sh"):
-                writer.write_command_block(chunk.body)
-                writer.write_output_block(chunk.captures)
 
     response = inputkey("Execution complete. Close pane? (y/n) ", "yn")
     match response:

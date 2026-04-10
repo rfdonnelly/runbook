@@ -33,7 +33,7 @@ class AsciidocWriter(Writer):
 
     def write_output_block(self, lines: list[str]) -> None:
         self.writer.write("[source,console]\n")
-        self.writer.write(".Output\n")
+        self.writer.write(".Example\n")
         self.writer.write("----\n")
         self.writer.writelines(lines)
         self.writer.write("----\n")
@@ -51,7 +51,7 @@ class MarkdownWriter(Writer):
         self.writenewline()
 
     def write_output_block(self, lines: list[str]) -> None:
-        self.writer.write("Output\n")
+        self.writer.write("Example\n")
         self.writer.write("```console\n")
         self.writer.writelines(lines)
         self.writer.write("```\n")
