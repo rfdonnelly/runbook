@@ -46,12 +46,16 @@ def inputkey(prompt: str, valid_chars: str, default_char: str | None = None) -> 
                 print(prompt, end="", flush=True)
             case key.ENTER:
                 if default_char:
-                    print("\r\033[K", end="", flush=True)
+                    erase_line()
                     return default_char
             case _:
                 if value in valid_chars:
-                    print("\r\033[K", end="", flush=True)
+                    erase_line()
                     return value
+
+
+def erase_line() -> None:
+    print("\r\033[K", end="", flush=True)
 
 
 def edit_command(commands: list[str]) -> list[str]:
@@ -73,8 +77,6 @@ def main() -> None:
 
     tmux = Tmux()
 
-    pane = tmux.create_shell(tmux.host_pane)
-
     book = Book(reader)
     chunk = book.first_chunk()
 
@@ -92,7 +94,10 @@ def main() -> None:
                 match response:
                     case "e":
                         chunk.body = edit_command(chunk.body)
-                        chunk.captures = pane.execute_and_capture_commands(chunk.body)
+                        if chunk.shell_new and chunk.shell_id is not "default":
+                            tmux.create_shell(chunk.shell_id, chunk.body[0].strip())
+                        else:
+                            chunk.captures = tmux.shells[chunk.shell_id].execute_and_capture_commands(chunk.body)
                         write_results(book, ifile_path.stem)
                     case "n":
                         pass
@@ -100,7 +105,10 @@ def main() -> None:
                         chunk = book.prev_command_block()
                         continue
                     case "x":
-                        chunk.captures = pane.execute_and_capture_commands(chunk.body)
+                        if chunk.shell_new and chunk.shell_id is not "default":
+                            tmux.create_shell(chunk.shell_id, chunk.body[0].strip())
+                        else:
+                            chunk.captures = tmux.shells[chunk.shell_id].execute_and_capture_commands(chunk.body)
                         write_results(book, ifile_path.stem)
                     case "q":
                         break
@@ -110,7 +118,8 @@ def main() -> None:
         else:
             break
 
-    response = inputkey("Execution complete. Close pane? (y/n) ", "yn")
+    response = inputkey("Execution complete. Close panes? (y/n) ", "yn")
     match response:
         case "y":
-            pane.kill()
+            for id, shell in tmux.shells.items():
+                shell.kill()

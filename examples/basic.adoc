@@ -46,4 +46,21 @@ Test output exceeds scrollback.
 seq 4000
 ----
 
+Alt shell
+
+[source,sh,id=rsp]
+----
+bash
+----
+
+[source,sh,id=rsp]
+----
+uname -a
+----
+
+[source,sh]
+----
+echo back in default pane
+----
+
 Some trailing text.

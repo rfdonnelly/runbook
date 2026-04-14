@@ -90,12 +90,15 @@ class Shell:
 class Tmux:
     shellrc: NamedTemporaryFile
     server: libtmux.Server
-    host_pane: libtmux.Pane
+    most_recent_pane: libtmux.Pane
+    shells: dict[str, Shell]
 
     def __init__(self):
         self.shellrc = self.create_shellrc()
         self.server = libtmux.Server()
-        self.host_pane = self.server.sessions[0].active_pane
+        self.most_recent_pane = self.server.sessions[0].active_pane
+        self.shells = dict()
+        self.create_shell("default", f"bash --rcfile {self.shellrc.name} -i")
 
     @staticmethod
     def create_shellrc() -> NamedTemporaryFile:
@@ -106,10 +109,11 @@ class Tmux:
         shellrc.flush()
         return shellrc
 
-    def create_shell(self, relative_to: libtmux.Pane) -> Shell:
-        return Shell(
-            relative_to.split(
-                direction=PaneDirection.Right,
-                shell=f"bash --rcfile {self.shellrc.name} -i",
-            )
+    def create_shell(self, id: str, shell: str) -> Shell:
+        new_pane = self.most_recent_pane.split(
+            direction=PaneDirection.Right,
+            shell=shell,
         )
+        new_pane.window.select_layout("even-horizontal")
+        self.most_recent_pane = new_pane
+        self.shells[id] = Shell(new_pane)
