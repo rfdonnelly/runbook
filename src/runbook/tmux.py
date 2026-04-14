@@ -35,9 +35,10 @@ class Shell:
         """
 
         marker = self.create_marker()
+        window_id = self.pane.window.id
         saved_window_name = self.pane.window.name
 
-        self.pane.send_keys(f"{command}; tmux rename-window {marker}")
+        self.pane.send_keys(f"{command}; tmux rename-window -t {window_id} {marker}")
 
         # Wait for command to complete. Completion is signaled by rename-window.
         while self.pane.window.name != marker:
