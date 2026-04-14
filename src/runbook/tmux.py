@@ -7,7 +7,7 @@ import libtmux
 from libtmux.constants import PaneDirection
 
 
-class TmuxPane:
+class Shell:
     pane: libtmux.Pane
 
     def __init__(self, pane: libtmux.Pane):
@@ -89,12 +89,12 @@ class TmuxPane:
 class Tmux:
     shellrc: NamedTemporaryFile
     server: libtmux.Server
-    host_pane: TmuxPane
+    host_pane: libtmux.Pane
 
     def __init__(self):
         self.shellrc = self.create_shellrc()
         self.server = libtmux.Server()
-        self.host_pane = TmuxPane(self.server.sessions[0].active_pane)
+        self.host_pane = self.server.sessions[0].active_pane
 
     @staticmethod
     def create_shellrc() -> NamedTemporaryFile:
@@ -105,9 +105,9 @@ class Tmux:
         shellrc.flush()
         return shellrc
 
-    def create_pane(self, relative_to: TmuxPane) -> TmuxPane:
-        return TmuxPane(
-            relative_to.pane.split(
+    def create_shell(self, relative_to: libtmux.Pane) -> Shell:
+        return Shell(
+            relative_to.split(
                 direction=PaneDirection.Right,
                 shell=f"bash --rcfile {self.shellrc.name} -i",
             )

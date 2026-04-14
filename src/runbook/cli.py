@@ -73,7 +73,7 @@ def main() -> None:
 
     tmux = Tmux()
 
-    pane = tmux.create_pane(tmux.host_pane)
+    pane = tmux.create_shell(tmux.host_pane)
 
     book = Book(reader)
     chunk = book.first_chunk()
