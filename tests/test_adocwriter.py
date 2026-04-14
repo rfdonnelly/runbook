@@ -21,7 +21,7 @@ class TestAsciidocWriter:
         writer.write_output_block(["1\n", "2\n"])
         expected = textwrap.dedent("""\
             [source,console]
-            .Output
+            .Example
             ----
             1
             2

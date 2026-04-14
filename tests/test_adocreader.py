@@ -46,6 +46,8 @@ class TestAsciidocReader:
             body=[
                 "command\n",
             ],
+            shell_id="default",
+            shell_new=True
         )
         assert next(reader) == expected
 
@@ -72,3 +74,83 @@ class TestAsciidocReader:
 
         with pytest.raises(StopIteration):
             next(reader)
+
+    def test_multishell(self):
+        input = """\
+            [source,sh]
+            ----
+            command
+            ----
+
+            [source,sh,id=2]
+            ----
+            command2
+            ----
+
+            [source,sh,id=2]
+            ----
+            command3
+            ----
+        """
+        input = textwrap.dedent(input)
+        reader = AsciidocReader(StringIO(input))
+
+        # FIXME: Shouldn't return blank chunks
+        expected = Markup([])
+        assert next(reader) == expected
+
+        expected = CodeBlock(
+            type="sh",
+            lines=[
+                "[source,sh]\n",
+                "----\n",
+                "command\n",
+                "----\n",
+            ],
+            body=[
+                "command\n",
+            ],
+            shell_id="default",
+            shell_new=True
+        )
+        assert next(reader) == expected
+
+        # FIXME: Shouldn't return blank chunks
+        expected = Markup([])
+        assert next(reader) == expected
+
+        expected = CodeBlock(
+            type="sh",
+            lines=[
+                "[source,sh,id=2]\n",
+                "----\n",
+                "command2\n",
+                "----\n",
+            ],
+            body=[
+                "command2\n",
+            ],
+            shell_id="2",
+            shell_new=True
+        )
+        assert next(reader) == expected
+
+        # FIXME: Shouldn't return blank chunks
+        expected = Markup([])
+        assert next(reader) == expected
+
+        expected = CodeBlock(
+            type="sh",
+            lines=[
+                "[source,sh,id=2]\n",
+                "----\n",
+                "command3\n",
+                "----\n",
+            ],
+            body=[
+                "command3\n",
+            ],
+            shell_id="2",
+            shell_new=False
+        )
+        assert next(reader) == expected
