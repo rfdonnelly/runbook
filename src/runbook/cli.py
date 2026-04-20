@@ -94,10 +94,16 @@ def main() -> None:
                 match response:
                     case "e":
                         chunk.body = edit_command(chunk.body)
-                        if chunk.shell_new and chunk.shell_id is not "default":
-                            tmux.create_shell(chunk.shell_id, chunk.body[0].strip())
+                        if chunk.shell_new and chunk.shell_id != "default":
+                            tmux.create_shell(chunk.shell_id)
+                        if chunk.shell_id != "default":
+                            chunk.captures = tmux.shells[
+                                chunk.shell_id
+                            ].execute_and_manual_capture_command(chunk.body[0].strip())
                         else:
-                            chunk.captures = tmux.shells[chunk.shell_id].execute_and_capture_commands(chunk.body)
+                            chunk.captures = tmux.shells[
+                                chunk.shell_id
+                            ].execute_and_capture_commands(chunk.body)
                         write_results(book, ifile_path.stem)
                     case "n":
                         pass
@@ -105,10 +111,16 @@ def main() -> None:
                         chunk = book.prev_command_block()
                         continue
                     case "x":
-                        if chunk.shell_new and chunk.shell_id is not "default":
-                            tmux.create_shell(chunk.shell_id, chunk.body[0].strip())
+                        if chunk.shell_new and chunk.shell_id != "default":
+                            tmux.create_shell(chunk.shell_id)
+                        if chunk.shell_id != "default":
+                            chunk.captures = tmux.shells[
+                                chunk.shell_id
+                            ].execute_and_manual_capture_command(chunk.body[0].strip())
                         else:
-                            chunk.captures = tmux.shells[chunk.shell_id].execute_and_capture_commands(chunk.body)
+                            chunk.captures = tmux.shells[
+                                chunk.shell_id
+                            ].execute_and_capture_commands(chunk.body)
                         write_results(book, ifile_path.stem)
                     case "q":
                         break

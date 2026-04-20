@@ -27,8 +27,7 @@ class Shell:
 
     def execute_and_capture_command(self, command: str) -> list[str]:
         """
-        Executes a command in the provided pane and returns the output including
-        prompt and command.
+        Executes a command and returns the output including prompt and command.
 
         Inserts a unique marker to mark the start of the output.  Command
         completion is signaled via the tmux window name.
@@ -45,6 +44,9 @@ class Shell:
             time.sleep(0.1)
         self.pane.window.rename_window(saved_window_name)
 
+        return self.capture(marker, ";")
+
+    def capture(self, marker: str, marker_separator: str) -> list[str]:
         lines = self.pane.capture_pane(join_wrapped=True)
         try:
             # Try capturing only visible text first
@@ -54,7 +56,7 @@ class Shell:
             lines = lines[start_index:-1]
 
             # Trim end marker
-            lines[0], *_ = lines[0].rsplit(";")
+            lines[0], *_ = lines[0].rsplit(marker_separator)
         except StopIteration:
             try:
                 # Fall back to capturing entire scrollback buffer
@@ -69,7 +71,7 @@ class Shell:
                 lines = lines[start_index:-1]
 
                 # Trim end marker
-                lines[0], *_ = lines[0].rsplit(";")
+                lines[0], *_ = lines[0].rsplit(marker_separator)
             except StopIteration:
                 # Fall back to captuing entire scrollback buffer w/o prompt + command
                 lines = ["<< SCROLLBACK EXCEEDED >>", *lines[0:-1]]
@@ -77,6 +79,15 @@ class Shell:
         lines = [line + "\n" for line in lines]
 
         return lines
+
+    def execute_and_manual_capture_command(self, command: str) -> list[str]:
+        marker = self.create_marker()
+
+        self.pane.send_keys(f"{command} # {marker}")
+
+        input("Press enter when command is complete")
+
+        return self.capture(marker, " #")
 
     @staticmethod
     def create_marker() -> str:
@@ -98,7 +109,7 @@ class Tmux:
         self.server = libtmux.Server()
         self.most_recent_pane = self.server.sessions[0].active_pane
         self.shells = dict()
-        self.create_shell("default", f"bash --rcfile {self.shellrc.name} -i")
+        self.create_shell("default")
 
     @staticmethod
     def create_shellrc() -> NamedTemporaryFile:
@@ -109,10 +120,10 @@ class Tmux:
         shellrc.flush()
         return shellrc
 
-    def create_shell(self, id: str, shell: str) -> Shell:
+    def create_shell(self, id: str) -> Shell:
         new_pane = self.most_recent_pane.split(
             direction=PaneDirection.Right,
-            shell=shell,
+            shell=f"bash --rcfile {self.shellrc.name} -i",
         )
         new_pane.window.select_layout("even-horizontal")
         self.most_recent_pane = new_pane

@@ -47,7 +47,7 @@ class TestAsciidocReader:
                 "command\n",
             ],
             shell_id="default",
-            shell_new=True
+            shell_new=True,
         )
         assert next(reader) == expected
 
@@ -111,7 +111,7 @@ class TestAsciidocReader:
                 "command\n",
             ],
             shell_id="default",
-            shell_new=True
+            shell_new=True,
         )
         assert next(reader) == expected
 
@@ -131,7 +131,7 @@ class TestAsciidocReader:
                 "command2\n",
             ],
             shell_id="2",
-            shell_new=True
+            shell_new=True,
         )
         assert next(reader) == expected
 
@@ -151,6 +151,6 @@ class TestAsciidocReader:
                 "command3\n",
             ],
             shell_id="2",
-            shell_new=False
+            shell_new=False,
         )
         assert next(reader) == expected
