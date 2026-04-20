@@ -54,7 +54,7 @@ class Shell:
             lines = lines[start_index:-1]
 
             # Trim end marker
-            lines[0], _ = lines[0].rsplit(";")
+            lines[0], *_ = lines[0].rsplit(";")
         except StopIteration:
             try:
                 # Fall back to capturing entire scrollback buffer
@@ -69,7 +69,7 @@ class Shell:
                 lines = lines[start_index:-1]
 
                 # Trim end marker
-                lines[0], _ = lines[0].rsplit(";")
+                lines[0], *_ = lines[0].rsplit(";")
             except StopIteration:
                 # Fall back to captuing entire scrollback buffer w/o prompt + command
                 lines = ["<< SCROLLBACK EXCEEDED >>", *lines[0:-1]]
