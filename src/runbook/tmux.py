@@ -76,7 +76,7 @@ class Shell:
                 # Fall back to captuing entire scrollback buffer w/o prompt + command
                 lines = ["<< SCROLLBACK EXCEEDED >>", *lines[0:-1]]
 
-        lines = [line + "\n" for line in lines]
+        lines = [line.rstrip() + "\n" for line in lines]
 
         return lines
 

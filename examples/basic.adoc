@@ -60,7 +60,7 @@ print("hello world")
 
 [source,sh]
 ----
-echo back in default pane
+echo 'trailing spaces    '
 ----
 
 Some trailing text.
