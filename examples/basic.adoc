@@ -48,14 +48,14 @@ seq 4000
 
 Alt shell
 
-[source,sh,id=rsp]
+[source,sh,id=py]
 ----
-bash
+python3
 ----
 
-[source,sh,id=rsp]
+[source,sh,id=py]
 ----
-uname -a
+print("hello world")
 ----
 
 [source,sh]
