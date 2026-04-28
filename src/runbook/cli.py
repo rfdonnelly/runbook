@@ -99,7 +99,7 @@ def main() -> None:
                         if chunk.shell_id != "default":
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
-                            ].execute_and_manual_capture_command(chunk.body[0].strip())
+                            ].execute_and_manual_capture_commands(chunk.body)
                         else:
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
@@ -116,7 +116,7 @@ def main() -> None:
                         if chunk.shell_id != "default":
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
-                            ].execute_and_manual_capture_command(chunk.body[0].strip())
+                            ].execute_and_manual_capture_commands(chunk.body)
                         else:
                             chunk.captures = tmux.shells[
                                 chunk.shell_id

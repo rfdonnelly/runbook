@@ -80,6 +80,15 @@ class Shell:
 
         return lines
 
+    def execute_and_manual_capture_commands(self, commands: list[str]) -> list[str]:
+        captures = []
+
+        for command in commands:
+            capture = self.execute_and_manual_capture_command(command.strip())
+            captures.extend(capture)
+
+        return captures
+
     def execute_and_manual_capture_command(self, command: str) -> list[str]:
         marker = self.create_marker()
 
