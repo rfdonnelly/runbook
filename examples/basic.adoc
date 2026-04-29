@@ -63,4 +63,16 @@ print("hello world")
 echo 'trailing spaces    '
 ----
 
+Background job
+
+[source,sh]
+----
+sleep 10 &
+----
+
+[source,sh]
+----
+jobs
+----
+
 Some trailing text.

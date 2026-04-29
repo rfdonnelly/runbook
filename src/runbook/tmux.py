@@ -37,14 +37,22 @@ class Shell:
         window_id = self.pane.window.id
         saved_window_name = self.pane.window.name
 
-        self.pane.send_keys(f"{command}; tmux rename-window -t {window_id} {marker}")
+        if command.endswith(" &"):
+            command = command.rstrip(" &")
+            marker_separator = " &"
+        else:
+            marker_separator = ";"
+
+        self.pane.send_keys(
+            f"{command}{marker_separator} tmux rename-window -t {window_id} {marker}"
+        )
 
         # Wait for command to complete. Completion is signaled by rename-window.
         while self.pane.window.name != marker:
             time.sleep(0.1)
         self.pane.window.rename_window(saved_window_name)
 
-        return self.capture(marker, ";")
+        return self.capture(marker, marker_separator)
 
     def capture(self, marker: str, marker_separator: str) -> list[str]:
         lines = self.pane.capture_pane(join_wrapped=True)
