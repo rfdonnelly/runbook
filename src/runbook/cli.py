@@ -28,8 +28,8 @@ def write_results(book: Book, path_stem: str) -> None:
                     writer.writelines(chunk.lines)
                     writer.writenewline()
             case CodeBlock(type="sh"):
-                writer.write_command_block(chunk.body)
-                writer.write_output_block(chunk.captures)
+                writer.write_command_block(chunk)
+                writer.write_output_block(chunk)
 
     ofile_adoc.close()
     ofile_md.close()
