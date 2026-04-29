@@ -18,8 +18,8 @@ class Writer:
     def write_markup(self, chunk: Markup) -> None:
         # FIXME: Shouldn't return blank chunks (see test_adocreader)
         if chunk.lines:
-            self.writer.writelines(chunk.lines)
-            self.writer.writenewline()
+            self.writelines(chunk.lines)
+            self.writenewline()
 
     def write_command_block(self, chunk: CodeBlock) -> None:
         pass

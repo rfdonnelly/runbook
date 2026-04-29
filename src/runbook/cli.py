@@ -23,10 +23,7 @@ def write_results(book: Book, path_stem: str) -> None:
     for chunk in book.chunks:
         match chunk:
             case Markup():
-                # FIXME: Shouldn't return blank chunks (see test_adocreader)
-                if chunk.lines:
-                    writer.writelines(chunk.lines)
-                    writer.writenewline()
+                writer.write_markup(chunk)
             case CodeBlock(type="sh"):
                 writer.write_command_block(chunk)
                 writer.write_output_block(chunk)
