@@ -1,6 +1,6 @@
 from typing import TextIO
 
-from runbook.datamodel import Chunk, Markup, CodeBlock
+from runbook.datamodel import Markup, CodeBlock
 
 
 class Writer:
@@ -18,8 +18,8 @@ class Writer:
     def write_markup(self, chunk: Markup) -> None:
         # FIXME: Shouldn't return blank chunks (see test_adocreader)
         if chunk.lines:
-            writer.writelines(chunk.lines)
-            writer.writenewline()
+            self.writer.writelines(chunk.lines)
+            self.writer.writenewline()
 
     def write_command_block(self, chunk: CodeBlock) -> None:
         pass
@@ -33,7 +33,12 @@ class AsciidocWriter(Writer):
         super().__init__(writer)
 
     def write_command_block(self, chunk: CodeBlock) -> None:
-        self.writer.write("[source,sh]\n")
+        match chunk.shell_id:
+            case "default":
+                self.writer.write("[source,sh]\n")
+            case _:
+                self.writer.write(f"[source,sh,id={chunk.shell_id}]\n")
+
         self.writer.write("----\n")
         self.writer.writelines(chunk.body)
         self.writer.write("----\n")
