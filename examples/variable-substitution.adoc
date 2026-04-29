@@ -1,0 +1,9 @@
+[source,sh]
+----
+who=world
+----
+
+[source,sh,id=2]
+----
+echo hello {{who}}
+----

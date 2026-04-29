@@ -1,4 +1,5 @@
 import random
+import re
 import string
 from tempfile import NamedTemporaryFile
 import time
@@ -15,6 +16,20 @@ class Shell:
 
     def kill(self) -> None:
         self.pane.kill()
+
+    def get_bash_variables(self) -> dict[str, str]:
+        context = {}
+
+        with NamedTemporaryFile(mode="rt") as file:
+            self.execute_and_capture_command(f"declare -p >{file.name}")
+            for line in file.readlines():
+                m = re.search(r'(\w+)="(.*)"', line)
+                if m:
+                    key = m.group(1)
+                    value = m.group(2)
+                    context[key] = value
+
+        return context
 
     def execute_and_capture_commands(self, commands: list[str]) -> list[str]:
         captures = []

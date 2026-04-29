@@ -1,9 +1,11 @@
 import os
 from pathlib import Path
+import re
 import signal
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
+import time
 
 from readchar import readkey, key
 
@@ -67,6 +69,22 @@ def edit_command(commands: list[str]) -> list[str]:
             return lines
 
 
+def preprocess_commands(tmux: Tmux, commands: list[str]) -> list[str]:
+    if any("{{" in command for command in commands):
+        context = tmux.shells["default"].get_bash_variables()
+
+        return [
+            re.sub(
+                r"{{\s*(\w+)\s*}}",
+                lambda match: context.get(match.group(1), match.group(0)),
+                command,
+            )
+            for command in commands
+        ]
+    else:
+        return commands
+
+
 def main() -> None:
     ifile_path = Path(sys.argv[1])
     ifile = open(ifile_path, "r")
@@ -93,10 +111,12 @@ def main() -> None:
                         chunk.body = edit_command(chunk.body)
                         if chunk.shell_new and chunk.shell_id != "default":
                             tmux.create_shell(chunk.shell_id)
+                            time.sleep(0.250)
                         if chunk.shell_id != "default":
+                            commands = preprocess_commands(tmux, chunk.body)
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
-                            ].execute_and_manual_capture_commands(chunk.body)
+                            ].execute_and_manual_capture_commands(commands)
                         else:
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
@@ -110,10 +130,13 @@ def main() -> None:
                     case "x":
                         if chunk.shell_new and chunk.shell_id != "default":
                             tmux.create_shell(chunk.shell_id)
+                            time.sleep(0.250)
                         if chunk.shell_id != "default":
+                            commands = preprocess_commands(tmux, chunk.body)
+                            print(commands)
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
-                            ].execute_and_manual_capture_commands(chunk.body)
+                            ].execute_and_manual_capture_commands(commands)
                         else:
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
