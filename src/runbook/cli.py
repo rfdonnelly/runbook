@@ -133,7 +133,6 @@ def main() -> None:
                             time.sleep(0.250)
                         if chunk.shell_id != "default":
                             commands = preprocess_commands(tmux, chunk.body)
-                            print(commands)
                             chunk.captures = tmux.shells[
                                 chunk.shell_id
                             ].execute_and_manual_capture_commands(commands)
