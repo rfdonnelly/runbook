@@ -1,8 +1,8 @@
-import random
 import re
 import string
 from tempfile import NamedTemporaryFile
 import time
+from uuid import uuid4
 
 import libtmux
 from libtmux.constants import PaneDirection
@@ -123,11 +123,7 @@ class Shell:
 
     @staticmethod
     def create_marker() -> str:
-        length = 32
-        characters = string.ascii_letters + string.digits
-        random_characters = random.choices(characters, k=length)
-        random_string = "".join(random_characters)
-        return random_string
+        return uuid4().hex
 
 
 class Tmux:
