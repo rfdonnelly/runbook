@@ -2,6 +2,7 @@ import textwrap
 from io import StringIO
 
 from runbook.writer import AsciidocWriter
+from runbook.datamodel import CodeBlock
 
 
 class TestAsciidocWriter:
@@ -18,7 +19,14 @@ class TestAsciidocWriter:
     def test_write_output_block(self):
         output = StringIO()
         writer = AsciidocWriter(output)
-        writer.write_output_block(["1\n", "2\n"])
+        chunk = CodeBlock(
+            type="sh",
+            lines=[],
+            body=[],
+            captures=["1\n", "2\n"],
+        )
+
+        writer.write_output_block(chunk)
         expected = textwrap.dedent("""\
             [source,console]
             .Example
