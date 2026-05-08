@@ -1,5 +1,4 @@
 import re
-import string
 from tempfile import NamedTemporaryFile
 import time
 from uuid import uuid4
