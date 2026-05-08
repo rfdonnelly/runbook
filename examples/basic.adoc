@@ -48,12 +48,12 @@ seq 4000
 
 Alt shell
 
-[source,sh,id=py]
+[source,sh,sid=py]
 ----
 python3
 ----
 
-[source,sh,id=py]
+[source,sh,sid=py]
 ----
 print("hello world")
 ----

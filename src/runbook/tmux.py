@@ -148,11 +148,11 @@ class Tmux:
         shellrc.flush()
         return shellrc
 
-    def create_shell(self, id: str) -> Shell:
+    def create_shell(self, sid: str) -> Shell:
         new_pane = self.most_recent_pane.split(
             direction=PaneDirection.Right,
             shell=f"bash --rcfile {self.shellrc.name} -i",
         )
         new_pane.window.select_layout("even-horizontal")
         self.most_recent_pane = new_pane
-        self.shells[id] = Shell(new_pane)
+        self.shells[sid] = Shell(new_pane)

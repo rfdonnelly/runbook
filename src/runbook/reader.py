@@ -20,14 +20,14 @@ class AsciidocReader:
     state: State
     previous_line: str | None
     eof: bool
-    ids: set[str]
+    sids: set[str]
 
     def __init__(self, reader: TextIO):
         self.reader = reader
         self.state = State.Markup
         self.previous_line = None
         self.eof = False
-        self.ids = set()
+        self.sids = set()
 
     def __iter__(self) -> Self:
         return self
@@ -84,15 +84,15 @@ class AsciidocReader:
                         self.state = State.Markup
                         lines.append(line)
                         header_end_index = lines.index("----\n")
-                        type, shell_id = self.parse_code_block_header(lines[0])
+                        type, sid = self.parse_code_block_header(lines[0])
                         self.strip_blank_lines(lines)
-                        shell_new = shell_id not in self.ids
-                        self.ids.add(shell_id)
+                        shell_new = sid not in self.sids
+                        self.sids.add(sid)
                         return CodeBlock(
                             type=type,
                             lines=lines,
                             body=lines[header_end_index + 1 : -1],
-                            shell_id=shell_id,
+                            sid=sid,
                             shell_new=shell_new,
                         )
                     else:
@@ -116,12 +116,12 @@ class AsciidocReader:
 
     @staticmethod
     def parse_code_block_header(line: str) -> (str, bool, str):
-        id = "default"
+        sid = "default"
         _, type, *remaining = line.removeprefix("[").removesuffix("]\n").split(",")
         for token in remaining:
-            if token.startswith("id="):
-                id = token.removeprefix("id=")
-        return type, id
+            if token.startswith("sid="):
+                sid = token.removeprefix("sid=")
+        return type, sid
 
     @staticmethod
     def is_code_block_body_delimiter(line: str) -> bool:

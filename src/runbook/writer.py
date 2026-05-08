@@ -33,11 +33,11 @@ class AsciidocWriter(Writer):
         super().__init__(writer)
 
     def write_command_block(self, chunk: CodeBlock) -> None:
-        match chunk.shell_id:
+        match chunk.sid:
             case "default":
                 self.writer.write("[source,sh]\n")
             case _:
-                self.writer.write(f"[source,sh,id={chunk.shell_id}]\n")
+                self.writer.write(f"[source,sh,sid={chunk.sid}]\n")
 
         self.writer.write("----\n")
         self.writer.writelines(chunk.body)

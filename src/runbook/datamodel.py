@@ -17,4 +17,5 @@ class CodeBlock(Chunk):
     body: list[str] = field(default_factory=list)
     captures: list[str] = field(default_factory=list)
     shell_new: bool = False
-    shell_id: str = "default"
+    # shell id
+    sid: str = "default"

@@ -109,17 +109,17 @@ def main() -> None:
                 match response:
                     case "e":
                         chunk.body = edit_command(chunk.body)
-                        if chunk.shell_new and chunk.shell_id != "default":
-                            tmux.create_shell(chunk.shell_id)
+                        if chunk.shell_new and chunk.sid != "default":
+                            tmux.create_shell(chunk.sid)
                             time.sleep(0.250)
-                        if chunk.shell_id != "default":
+                        if chunk.sid != "default":
                             commands = preprocess_commands(tmux, chunk.body)
                             chunk.captures = tmux.shells[
-                                chunk.shell_id
+                                chunk.sid
                             ].execute_and_manual_capture_commands(commands)
                         else:
                             chunk.captures = tmux.shells[
-                                chunk.shell_id
+                                chunk.sid
                             ].execute_and_capture_commands(chunk.body)
                         write_results(book, ifile_path.stem)
                     case "n":
@@ -128,17 +128,17 @@ def main() -> None:
                         chunk = book.prev_command_block()
                         continue
                     case "x":
-                        if chunk.shell_new and chunk.shell_id != "default":
-                            tmux.create_shell(chunk.shell_id)
+                        if chunk.shell_new and chunk.sid != "default":
+                            tmux.create_shell(chunk.sid)
                             time.sleep(0.250)
-                        if chunk.shell_id != "default":
+                        if chunk.sid != "default":
                             commands = preprocess_commands(tmux, chunk.body)
                             chunk.captures = tmux.shells[
-                                chunk.shell_id
+                                chunk.sid
                             ].execute_and_manual_capture_commands(commands)
                         else:
                             chunk.captures = tmux.shells[
-                                chunk.shell_id
+                                chunk.sid
                             ].execute_and_capture_commands(chunk.body)
                         write_results(book, ifile_path.stem)
                     case "q":
@@ -152,5 +152,5 @@ def main() -> None:
     response = inputkey("Execution complete. Close panes? (y/n) ", "yn")
     match response:
         case "y":
-            for id, shell in tmux.shells.items():
+            for sid, shell in tmux.shells.items():
                 shell.kill()

@@ -46,7 +46,7 @@ class TestAsciidocReader:
             body=[
                 "command\n",
             ],
-            shell_id="default",
+            sid="default",
             shell_new=True,
         )
         assert next(reader) == expected
@@ -82,12 +82,12 @@ class TestAsciidocReader:
             command
             ----
 
-            [source,sh,id=2]
+            [source,sh,sid=2]
             ----
             command2
             ----
 
-            [source,sh,id=2]
+            [source,sh,sid=2]
             ----
             command3
             ----
@@ -110,7 +110,7 @@ class TestAsciidocReader:
             body=[
                 "command\n",
             ],
-            shell_id="default",
+            sid="default",
             shell_new=True,
         )
         assert next(reader) == expected
@@ -122,7 +122,7 @@ class TestAsciidocReader:
         expected = CodeBlock(
             type="sh",
             lines=[
-                "[source,sh,id=2]\n",
+                "[source,sh,sid=2]\n",
                 "----\n",
                 "command2\n",
                 "----\n",
@@ -130,7 +130,7 @@ class TestAsciidocReader:
             body=[
                 "command2\n",
             ],
-            shell_id="2",
+            sid="2",
             shell_new=True,
         )
         assert next(reader) == expected
@@ -142,7 +142,7 @@ class TestAsciidocReader:
         expected = CodeBlock(
             type="sh",
             lines=[
-                "[source,sh,id=2]\n",
+                "[source,sh,sid=2]\n",
                 "----\n",
                 "command3\n",
                 "----\n",
@@ -150,7 +150,7 @@ class TestAsciidocReader:
             body=[
                 "command3\n",
             ],
-            shell_id="2",
+            sid="2",
             shell_new=False,
         )
         assert next(reader) == expected
