@@ -74,6 +74,11 @@ class Shell:
         def trim_capture(
             lines: list[str], marker: str, marker_separator: str
         ) -> list[str]:
+            """
+            Trims lines before start marker and trims marker from first line.
+
+            :raises StopIteration: if start marker is not found
+            """
             # Trim lines before start marker
             start_index = next(
                 (index for (index, line) in enumerate(lines) if line.endswith(marker))
@@ -85,8 +90,9 @@ class Shell:
                 lines[0], _ = lines[0].rsplit(marker_separator, 1)
             except ValueError:
                 # Due to "not enough values to unpack"
-                # This can happen if marker was found command was split over multiple lines
-                # Fall back to having the user parse the capture
+                # This can happen if marker was found but command was split
+                # over multiple lines. Fall back to having the user parse the
+                # capture
                 lines = edit_lines(lines)
 
             return lines
