@@ -71,16 +71,17 @@ class Shell:
         return self.capture(marker, marker_separator)
 
     def capture(self, marker: str, marker_separator: str) -> list[str]:
-        def capture_helper(
+        def trim_capture(
             lines: list[str], marker: str, marker_separator: str
         ) -> list[str]:
+            # Trim lines before start marker
             start_index = next(
                 (index for (index, line) in enumerate(lines) if line.endswith(marker))
             )
             lines = lines[start_index:-1]
 
             try:
-                # Trim end marker
+                # Trim start marker from first line
                 lines[0], _ = lines[0].rsplit(marker_separator, 1)
             except ValueError:
                 # Due to "not enough values to unpack"
@@ -93,12 +94,12 @@ class Shell:
         lines = self.pane.capture_pane(join_wrapped=True)
         try:
             # Try capturing only visible text first
-            lines = capture_helper(lines, marker, marker_separator)
+            lines = trim_capture(lines, marker, marker_separator)
         except StopIteration:
             try:
                 # Fall back to capturing entire scrollback buffer
                 lines = self.pane.capture_pane(start="-", join_wrapped=True)
-                lines = capture_helper(lines, marker, marker_separator)
+                lines = trim_capture(lines, marker, marker_separator)
             except StopIteration:
                 # Fall back to captuing entire scrollback buffer w/o prompt + command
                 lines = ["<< SCROLLBACK EXCEEDED >>", *lines[0:-1]]
