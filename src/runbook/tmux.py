@@ -6,6 +6,8 @@ from uuid import uuid4
 import libtmux
 from libtmux.constants import PaneDirection
 
+from runbook.edit import edit_lines
+
 
 class Shell:
     pane: libtmux.Pane
@@ -77,8 +79,14 @@ class Shell:
             )
             lines = lines[start_index:-1]
 
-            # Trim end marker
-            lines[0], _ = lines[0].rsplit(marker_separator, 1)
+            try:
+                # Trim end marker
+                lines[0], _ = lines[0].rsplit(marker_separator, 1)
+            except ValueError:
+                # Due to "not enough values to unpack"
+                # This can happen if marker was found command was split over multiple lines
+                # Fall back to having the user parse the capture
+                lines = edit_lines(lines)
 
             return lines
 
