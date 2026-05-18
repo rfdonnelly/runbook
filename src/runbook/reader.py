@@ -115,7 +115,7 @@ class AsciidocReader:
         return line.startswith("[source,sh") or line.startswith("[source,console]")
 
     @staticmethod
-    def parse_code_block_header(line: str) -> (str, bool, str):
+    def parse_code_block_header(line: str) -> tuple[str, str]:
         sid = "default"
         _, type, *remaining = line.removeprefix("[").removesuffix("]\n").split(",")
         for token in remaining:
