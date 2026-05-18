@@ -2,13 +2,12 @@ import os
 from pathlib import Path
 import re
 import signal
-import subprocess
 import sys
-from tempfile import NamedTemporaryFile
 import time
 
 from readchar import readkey, key
 
+from runbook.edit import edit_lines
 from runbook.tmux import Tmux
 from runbook.book import Book
 from runbook.reader import AsciidocReader, Markup, CodeBlock
@@ -57,18 +56,6 @@ def erase_line() -> None:
     print("\r\033[K", end="", flush=True)
 
 
-def edit_command(commands: list[str]) -> list[str]:
-    with NamedTemporaryFile(mode="wt", delete_on_close=False) as wfile:
-        wfile.writelines(commands)
-        wfile.close()
-        subprocess.run(["vim", wfile.name])
-        with open(wfile.name, mode="rt") as rfile:
-            lines = rfile.readlines()
-            # filter blank lines
-            lines = [line for line in lines if line != "\n"]
-            return lines
-
-
 def preprocess_commands(tmux: Tmux, commands: list[str]) -> list[str]:
     if any("{{" in command for command in commands):
         context = tmux.shells["default"].get_bash_variables()
@@ -108,7 +95,7 @@ def main() -> None:
                 )
                 match response:
                     case "e":
-                        chunk.body = edit_command(chunk.body)
+                        chunk.body = edit_lines(chunk.body, remove_blank_lines=True)
                         if chunk.shell_new and chunk.sid != "default":
                             tmux.create_shell(chunk.sid)
                             time.sleep(0.250)
