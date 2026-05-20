@@ -13,5 +13,5 @@ tmux
 Start a runbook.
 
 ```sh
-runbook examples/basic.adoc
+runbook run examples/basic.adoc
 ```

@@ -72,8 +72,8 @@ def preprocess_commands(tmux: Tmux, commands: list[str]) -> list[str]:
         return commands
 
 
-def main() -> None:
-    ifile_path = Path(sys.argv[1])
+def main(ifile_path: str) -> None:
+    ifile_path = Path(ifile_path)
     ifile = open(ifile_path, "r")
     reader = AsciidocReader(ifile)
 
@@ -141,3 +141,4 @@ def main() -> None:
         case "y":
             for sid, shell in tmux.shells.items():
                 shell.kill()
+
