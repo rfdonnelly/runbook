@@ -91,7 +91,7 @@ def main(ifile_path: str) -> None:
             case CodeBlock(type="sh"):
                 print("".join(chunk.body))
                 response = inputkey(
-                    "E[X]ecute/[n]ext/[e]dit/[p]revious/[q]uit? ", "xnepq", "x"
+                    "E[X]ecute/[n]ext/[i]nsert/[e]dit/[p]revious/[q]uit? ", "xniepq", "x"
                 )
                 match response:
                     case "e":
@@ -111,6 +111,13 @@ def main(ifile_path: str) -> None:
                         write_results(book, ifile_path.stem)
                     case "n":
                         pass
+                    case "i":
+                        response = inputkey("[m]arkup/[c]ommand? ", "mc", "m")
+                        case "m":
+                            lines = edit_lines([], remove_blank_lines=False)
+                            chunk = book.insert_markup(lines)
+                        case "c":
+                            pass
                     case "p":
                         chunk = book.prev_command_block()
                         continue

@@ -73,3 +73,12 @@ class Book:
                 return True
             case _:
                 return False
+
+    def insert_markup(self, lines: list[str]) -> Chunk:
+        self.chunks.insert(self.index, Markup(lines))
+        self.index += 1
+        return chunk
+
+    def insert_command_block(self, chunk: CodeBlock) -> Chunk:
+        self.chunks.insert(self.index, chunk)
+        return chunk
