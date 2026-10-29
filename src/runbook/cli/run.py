@@ -140,4 +140,3 @@ def main(ifile_path: str) -> None:
         case "y":
             for sid, shell in tmux.shells.items():
                 shell.kill()
-
