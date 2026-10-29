@@ -139,14 +139,14 @@ class Shell:
 
 class Tmux:
     shellrc: NamedTemporaryFile
-    server: libtmux.Server
+    session: libtmux.Session
     most_recent_pane: libtmux.Pane
     shells: dict[str, Shell]
 
     def __init__(self):
         self.shellrc = self.create_shellrc()
-        self.server = libtmux.Server()
-        self.most_recent_pane = self.server.sessions[0].active_pane
+        self.session = libtmux.Session.from_env()
+        self.most_recent_pane = self.session.active_pane
         self.shells = dict()
         self.create_shell("default")
 
