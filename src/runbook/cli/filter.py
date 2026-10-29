@@ -1,8 +1,9 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
-from runbook.reader import AsciidocReader, Markup, CodeBlock
+from runbook.reader import AsciidocReader, CodeBlock, Markup
 from runbook.writer import AsciidocWriter
+
 
 def main(ifile_path: str) -> None:
     ifile_path = Path(ifile_path)

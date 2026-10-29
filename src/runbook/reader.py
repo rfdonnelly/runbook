@@ -1,10 +1,8 @@
-from enum import Enum
 import logging
-from typing import TextIO, Self
+from enum import Enum
+from typing import Self, TextIO
 
-
-from runbook.datamodel import Chunk, Markup, CodeBlock
-
+from runbook.datamodel import Chunk, CodeBlock, Markup
 
 logger = logging.getLogger(__name__)
 

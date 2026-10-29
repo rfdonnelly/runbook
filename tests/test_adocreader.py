@@ -3,8 +3,8 @@ from io import StringIO
 
 import pytest
 
+from runbook.datamodel import CodeBlock, Markup
 from runbook.reader import AsciidocReader
-from runbook.datamodel import Markup, CodeBlock
 
 
 class TestAsciidocReader:

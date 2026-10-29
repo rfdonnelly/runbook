@@ -1,8 +1,8 @@
 import os
 import re
 import sys
-from tempfile import NamedTemporaryFile
 import time
+from tempfile import NamedTemporaryFile
 from uuid import uuid4
 
 import libtmux
@@ -83,7 +83,7 @@ class Shell:
             """
             # Trim lines before start marker
             start_index = next(
-                (index for (index, line) in enumerate(lines) if line.endswith(marker))
+                index for (index, line) in enumerate(lines) if line.endswith(marker)
             )
             lines = lines[start_index:-1]
 

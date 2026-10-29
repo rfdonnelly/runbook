@@ -1,5 +1,5 @@
 from runbook.book import Book
-from runbook.datamodel import Markup, CodeBlock
+from runbook.datamodel import CodeBlock, Markup
 
 
 class TestBook:

@@ -1,17 +1,16 @@
 import os
-from pathlib import Path
 import re
 import signal
-import sys
 import time
+from pathlib import Path
 
-from readchar import readkey, key
+from readchar import key, readkey
 
-from runbook.edit import edit_lines
-from runbook.tmux import Tmux
 from runbook.book import Book
-from runbook.reader import AsciidocReader, Markup, CodeBlock
-from runbook.writer import Writers, AsciidocWriter, MarkdownWriter
+from runbook.edit import edit_lines
+from runbook.reader import AsciidocReader, CodeBlock, Markup
+from runbook.tmux import Tmux
+from runbook.writer import AsciidocWriter, MarkdownWriter, Writers
 
 
 def write_results(book: Book, path_stem: str) -> None:

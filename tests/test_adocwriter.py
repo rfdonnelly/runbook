@@ -1,8 +1,8 @@
 import textwrap
 from io import StringIO
 
-from runbook.writer import AsciidocWriter
 from runbook.datamodel import CodeBlock
+from runbook.writer import AsciidocWriter
 
 
 class TestAsciidocWriter:

@@ -1,6 +1,6 @@
 from typing import TextIO
 
-from runbook.datamodel import Markup, CodeBlock
+from runbook.datamodel import CodeBlock, Markup
 
 
 class Writer:

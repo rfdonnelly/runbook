@@ -1,6 +1,6 @@
-from typing import Iterable
+from collections.abc import Iterable
 
-from runbook.datamodel import Chunk, Markup, CodeBlock
+from runbook.datamodel import Chunk, CodeBlock, Markup
 
 
 class IterError(Exception):
@@ -43,7 +43,7 @@ class Book:
         if self.index <= 0:
             return False
 
-        return any((self.is_command_block(index) for index in range(self.index)))
+        return any(self.is_command_block(index) for index in range(self.index))
 
     def prev_command_block(self) -> Chunk:
         if not self.prev_chunk_exists():

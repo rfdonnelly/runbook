@@ -1,5 +1,5 @@
-from tempfile import NamedTemporaryFile
 import subprocess
+from tempfile import NamedTemporaryFile
 
 
 def edit_lines(commands: list[str], remove_blank_lines: bool = False) -> list[str]:

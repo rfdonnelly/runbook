@@ -1,7 +1,8 @@
 import sys
 
-import runbook.cli.run
 import runbook.cli.filter
+import runbook.cli.run
+
 
 def main() -> None:
     command, *arguments = sys.argv[1:]
