@@ -153,7 +153,7 @@ class Tmux:
             command = ["tmux", "new-session", "--", *sys.argv]
             os.execvp(command[0], command)
         self.most_recent_pane = self.session.active_pane
-        self.shells = dict()
+        self.shells = {}
         self.create_shell("default")
 
     @staticmethod

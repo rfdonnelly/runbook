@@ -138,5 +138,5 @@ def main(ifile_path: str) -> None:
     response = inputkey("Execution complete. Close panes? (y/n) ", "yn")
     match response:
         case "y":
-            for sid, shell in tmux.shells.items():
+            for shell in tmux.shells.values():
                 shell.kill()

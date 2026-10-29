@@ -110,7 +110,7 @@ class AsciidocReader:
 
     @staticmethod
     def is_start_of_code_block_header(line: str) -> bool:
-        return line.startswith("[source,sh") or line.startswith("[source,console]")
+        return line.startswith(("[source,sh", "[source,console]"))
 
     @staticmethod
     def parse_code_block_header(line: str) -> tuple[str, str]:
