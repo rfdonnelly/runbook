@@ -1,4 +1,6 @@
+import os
 import re
+import sys
 from tempfile import NamedTemporaryFile
 import time
 from uuid import uuid4
@@ -145,7 +147,11 @@ class Tmux:
 
     def __init__(self):
         self.shellrc = self.create_shellrc()
-        self.session = libtmux.Session.from_env()
+        try:
+            self.session = libtmux.Session.from_env()
+        except libtmux.exc.NotInsideTmux:
+            command = ["tmux", "new-session", "--", *sys.argv]
+            os.execvp(command[0], command)
         self.most_recent_pane = self.session.active_pane
         self.shells = dict()
         self.create_shell("default")
